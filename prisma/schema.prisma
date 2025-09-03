@@ -19,4 +19,20 @@ model Message {
   text      String   @db.Text
   sender    String
   createdAt DateTime @default(now())
+
+  // NEW: This is the foreign key that links a Message to a User.
+
+    authorId  String
+    author    User     @relation(fields: [authorId], references: [id])
+
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[] // NEW: This is a relationship field that tells a User about all the messages they've sent.
+
 }

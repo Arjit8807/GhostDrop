@@ -9,7 +9,8 @@ type Message = {
   id: number; 
   text: string; 
   sender: 'user' | 'other'; 
-  code?: boolean; 
+  code?: boolean;
+  createdAt: string;
 };
 
 // This is important because it prevents us from creating a new connection every time the component re-renders.
@@ -21,12 +22,12 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState(''); // State for the text in the input box.
   const [isAnonymous, setIsAnonymous] = useState(true);
-const [isConnected, setIsConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
 
 
   //This 'useEffect' hook handles our socket connection and its lifecycle.
    useEffect(() => {
-    const socketInitializer = async () => {
+    // const socketInitializer = async () => {
       if (!socket) {
         // await fetch('/api/socket');
         socket = io('http://localhost:3001');
@@ -37,17 +38,24 @@ const [isConnected, setIsConnected] = useState(false);
         console.log('Socket connected successfully!');
       });
 
+      //We set this as our initial messages.
+    socket.on('initial-messages', (initialMessages: Message[]) => {
+        setMessages(initialMessages);
+    });
+
 
         socket.on('receive-message', (data: Message) => {
         // We use `prevMessages` to make sure we don't accidentally erase the old messages.
         setMessages((prevMessages) => [...prevMessages, data]);
       });
-    };
+    
 
-    socketInitializer();
+    // socketInitializer();
 
      return () => {
       if (socket) {
+        socket.off('receive-message');
+        socket.off('initial-messages'); // FIX: We also need to turn off this new listener.
         socket.disconnect();
         socket = null;
       }
@@ -73,12 +81,11 @@ const [isConnected, setIsConnected] = useState(false);
         return;
     }
 
-     // We create a new message object with the current input and sender.
-    const newMessage: Message = {
-      id: Date.now(),
+    // FIX: We are now sending a simpler message object to the server.
+    // The server will handle creating the ID and timestamp for us.
+    const newMessage = {
       text: input,
-      sender: isAnonymous ? 'user' : 'other', // The sender depends on the toggle state.
-      code: false,
+      sender: isAnonymous ? 'user' : 'other',
     };
 
     
