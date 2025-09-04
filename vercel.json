@@ -1,0 +1,22 @@
+{
+  "builds": [
+    {
+      "src": "next.config.js",
+      "use": "@vercel/next@latest"
+    },
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "next.config.js"
+    },
+    {
+      "src": "/socket.io/(.*)",
+      "dest": "/server.js"
+    }
+  ]
+}
