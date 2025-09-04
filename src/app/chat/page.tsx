@@ -33,6 +33,8 @@ export default function ChatPage() {
         socket = io('http://localhost:3001');
       }
 
+      // socketInitializer();
+
       socket.on('connect', () => {
         setIsConnected(true);
         console.log('Socket connected successfully!');
