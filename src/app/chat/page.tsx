@@ -412,7 +412,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (!socket) {
-      socket = io('http://localhost:3001',{ path: '/api/socket' });
+      socket = io('http://localhost:3001');
     }
 
     socket.on('connect', () => {
@@ -423,7 +423,7 @@ export default function ChatPage() {
     socket.on('receive-message', (data: Message) => {
       setMessages((prevMessages) => [...prevMessages, data]);
     });
-    
+
     return () => {
       if (socket) {
         socket.off('receive-message');
@@ -458,7 +458,7 @@ export default function ChatPage() {
       socket.emit('send-message', newMessage);
       // setMessages((prevMessages) => [...prevMessages, newMessage]);
     }
-    
+
     setInput('');
   };
 
